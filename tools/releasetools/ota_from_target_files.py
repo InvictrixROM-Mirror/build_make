@@ -496,6 +496,10 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.RunBackup("backup")
     script.Unmount("/system")
 
+  script.RunSubsClean()
+
+  device_specific.FullOTA_InstallBegin()
+
   system_progress = 0.75
   
   script.Print(" ***********************************************   ");
