@@ -1,4 +1,13 @@
 # Put some miscellaneous rules here
+#
+# Build system colors
+#
+# PFX: Prefix "target C++:" in yellow
+# INS: Module "Install:" output color (cyan for ics)
+
+ifneq ($(BUILD_WITH_COLORS),0)
+    include $(TOP_DIR)build/core/colors.mk
+endif
 
 # HACK: clear LOCAL_PATH from including last build target before calling
 # intermedites-dir-for
@@ -2525,14 +2534,20 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) \
 	   $(if $(OEM_OTA_CONFIG), -o $(OEM_OTA_CONFIG)) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-CUSTOM_TARGET_PACKAGE := $(PRODUCT_OUT)/$(TARGET_PRODUCT).zip
+INVICTUS_TARGET_PACKAGE := $(PRODUCT_OUT)/$(INV_VERSION).zip
 
-.PHONY: otapackage bacon
+.PHONY: otapackage bacon invictus
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
-	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(CUSTOM_TARGET_PACKAGE)
-	$(hide) $(MD5SUM) $(CUSTOM_TARGET_PACKAGE) > $(CUSTOM_TARGET_PACKAGE).md5sum
-	@echo -e "Package complete: $(CUSTOM_TARGET_PACKAGE)"
+        $(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(INVICTUS_TARGET_PACKAGE)
+        $(hide) $(MD5SUM) $(INVICTUS_TARGET_PACKAGE) > $(INVICTUS_TARGET_PACKAGE).md5sum
+	@echo -e ${CL_RED}""${CL_RED}
+	@echo -e ${CL_RED}"Package complete: $(GZOSP_TARGET_PACKAGE)"${CL_RED}
+invictus: otapackage
+        $(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(INVICTUS_TARGET_PACKAGE)
+        $(hide) $(MD5SUM) $(INVICTUS_TARGET_PACKAGE) > $(INVICTUS_TARGET_PACKAGE).md5sum
+	@echo -e ${CL_RED}""${CL_RED}
+	@echo -e ${CL_RED}"Package complete: $(GZOSP_TARGET_PACKAGE)"${CL_RED}
 
 endif    # build_ota_package
 
