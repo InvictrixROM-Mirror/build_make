@@ -21,6 +21,7 @@ Invoke ". build/envsetup.sh" from your shell to add the following functions to y
 - sgrep:     Greps on all local source files.
 - godir:     Go to the directory containing a file.
 - pushboot:	 Push a file from your OUT dir to your phone and reboots it, using absolute path.
+- tclist:     List toolchain options
 
 Environment options:
 - SANITIZE_HOST: Set to 'true' to use ASAN for all host modules. Note that
@@ -1583,6 +1584,27 @@ function godir () {
         pathname=${lines[0]}
     fi
     \cd $T/$pathname
+}
+
+function tclist {
+ dir=prebuilts/gcc/linux-x86/
+    if [[ -f /usr/bin/tree ]]
+       then
+          tree -L 2 $dir -I 'host' |
+          sed s':prebuilts/gcc/linux-x86/:** Toolchain Options **:' |
+          sed s'/aarch64-linux-android-//' |
+          sed s'/aarch64-linux-gnu-//'|
+          sed s'/arm-eabi-//' |
+          sed s'/arm-linux-androideabi-//' |
+          sed s'/arm-linux-gnueabi-//' |
+          sed s'/x86_64-linux-glibc2.15-//' |
+          sed s'/x86_64-w64-mingw32-//' |
+          sed s'/x86_64-linux-android-//';
+    else
+       echo
+       echo 'The binary "tree" is not installed on your system'
+       echo
+fi
 }
 
 # Make using all available CPUs
