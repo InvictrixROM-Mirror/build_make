@@ -2542,18 +2542,12 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) \
 
 INVICTUS_TARGET_PACKAGE := $(PRODUCT_OUT)/$(INV_VERSION).zip
 
-.PHONY: otapackage bacon invictus
+.PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
 bacon: otapackage
-        $(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(INVICTUS_TARGET_PACKAGE)
-        $(hide) $(MD5SUM) $(INVICTUS_TARGET_PACKAGE) > $(INVICTUS_TARGET_PACKAGE).md5sum
-	@echo -e ${CL_RED}""${CL_RED}
-	@echo -e ${CL_RED}"Package complete: $(GZOSP_TARGET_PACKAGE)"${CL_RED}
-invictus: otapackage
-        $(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(INVICTUS_TARGET_PACKAGE)
-        $(hide) $(MD5SUM) $(INVICTUS_TARGET_PACKAGE) > $(INVICTUS_TARGET_PACKAGE).md5sum
-	@echo -e ${CL_RED}""${CL_RED}
-	@echo -e ${CL_RED}"Package complete: $(GZOSP_TARGET_PACKAGE)"${CL_RED}
+	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(INVICTUS_TARGET_PACKAGE)
+	$(hide) $(MD5SUM) $(INVICTUS_TARGET_PACKAGE) > $(INVICTUS_TARGET_PACKAGE).md5sum
+	@echo -e "Package complete: $(INVICTUS_TARGET_PACKAGE)"
 
 endif    # build_ota_package
 

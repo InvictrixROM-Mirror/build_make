@@ -82,7 +82,7 @@ function check_product()
     else
         INV_BUILD=
     fi
-    export INV__BUILD
+    export INV_BUILD
 
         TARGET_PRODUCT=$1 \
         TARGET_BUILD_VARIANT= \
