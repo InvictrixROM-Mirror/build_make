@@ -504,7 +504,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   script.Print("      / // __ \ | / / / ___/ __/ / / / ___/    ");
   script.Print("    _/ // / / / |/ / / /__/ /_/ /_/ (__  )     "); 
   script.Print("   /___/_/ /_/|___/_/\___/\__/\__,_/____/      ");
-  scirpt.Print("                                               "); 
+  script.Print("                                               "); 
   script.Print("           Ground Zero Based Project           ");
   script.Print("***********************************************");                                        
 
