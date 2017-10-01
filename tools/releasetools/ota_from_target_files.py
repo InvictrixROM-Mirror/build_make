@@ -498,11 +498,17 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
 
   system_progress = 0.75
 
-  script.Print("*********************************************");
-  script.Print("                 InvictusRom                 ");
-  script.Print("           Ground Zero Based Project         ");
-  script.Print("*********************************************");
+  script.Print("***********************************************");
+  script.Print("       ____           _      __                ");
+  script.Print("      /  _/___ _   __(_)____/ /___  _______    ");
+  script.Print("      / // __ \ | / / / ___/ __/ / / / ___/    ");
+  script.Print("    _/ // / / / |/ / / /__/ /_/ /_/ (__  )     "); 
+  script.Print("   /___/_/ /_/|___/_/\___/\__/\__,_/____/      ");
+  scirpt.Print("                                               "); 
+  script.Print("           Ground Zero Based Project           ");
+  script.Print("***********************************************");                                        
 
+                                                                                 
   if OPTIONS.wipe_user_data:
     system_progress -= 0.1
   if HasVendorPartition(input_zip):
