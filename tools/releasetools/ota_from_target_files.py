@@ -497,18 +497,20 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     script.Unmount("/system")
 
   system_progress = 0.75
+  
+  script.Print(" ***********************************************   ");
+  script.Print("                 #SharpenYourBlade                 ");
+  script.Print("        ____           _      __      _            ");
+  script.Print("       /  _/___ _   __(_)____/ /_____(_)_  __      ");
+  script.Print("       / // __ \ | / / / ___/ __/ ___/ / |/_/      ");
+  script.Print("     _/ // / / / |/ / / /__/ /_/ /  / />  <        ");
+  script.Print("    /___/_/ /_/|___/_/\___/\__/_/  /_/_/|_|        ");
+  script.Print("                                                   ");
+  script.Print("           Ground Zero Based Project               ");
+  script.Print(" ***********************************************   ");                                            
+                                      
 
-  script.Print("***********************************************");
-  script.Print("       ____           _      __                ");
-  script.Print("      /  _/___ _   __(_)____/ /___  _______    ");
-  script.Print("      / // __ \ | / / / ___/ __/ / / / ___/    ");
-  script.Print("    _/ // / / / |/ / / /__/ /_/ /_/ (__  )     "); 
-  script.Print("   /___/_/ /_/|___/_/\___/\__/\__,_/____/      ");
-  script.Print("                                               "); 
-  script.Print("           Ground Zero Based Project           ");
-  script.Print("***********************************************");                                        
-
-                                                                                 
+                                                                              
   if OPTIONS.wipe_user_data:
     system_progress -= 0.1
   if HasVendorPartition(input_zip):
