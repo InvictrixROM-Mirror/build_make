@@ -182,6 +182,7 @@ include $(BUILD_SYSTEM)/device.mk
 # An Invictus build needs only the Invictus product makefiles.
 ifneq ($(INV_BUILD),)
   all_product_configs := $(shell find device -path "*/$(INV_BUILD)/invictus.mk")
+  all_product_configs += $(shell find device -path "*/$(INV_BUILD)/gzosp.mk")
 else
   ifneq ($(strip $(TARGET_BUILD_APPS)),)
   # An unbundled app build needs only the core product makefiles.
