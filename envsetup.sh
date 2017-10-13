@@ -76,20 +76,18 @@ function check_product()
         echo "Couldn't locate the top of the tree.  Try setting TOP." >&2
         return
     fi
+    INV_PRODUCT=$(echo -n $1 | sed 's/_.*//g')
     if (echo -n $1 | grep -q -e "^inv_") ; then
         INV_BUILD=$(echo -n $1 | sed -e 's/^inv_//g')
         export BUILD_NUMBER=$( (date +%s%N ; echo $INV_BUILD; hostname) | openssl sha1 | sed -e 's/.*=//g; s/ //g' | cut -c1-10 )
-        GZOSP_PRODUCT=false
     elif (echo -n $1 | grep -q -e "^gzosp_") ; then
         INV_BUILD=$(echo -n $1 | sed -e 's/^gzosp_//g')
         export BUILD_NUMBER=$( (date +%s%N ; echo $INV_BUILD; hostname) | openssl sha1 | sed -e 's/.*=//g; s/ //g' | cut -c1-10 )
-        GZOSP_PRODUCT=true
     else
         INV_BUILD=
-        GZOSP_PRODUCT=
+        INV_PRODUCT=$(echo "")
     fi
     export INV_BUILD
-    export GZOSP_PRODUCT
 
         TARGET_PRODUCT=$1 \
         TARGET_BUILD_VARIANT= \
@@ -624,10 +622,10 @@ function lunch()
         # if we can't find a product, try to grab it off the Invictus GitHub
         T=$(gettop)
         cd $T > /dev/null
-        if [[ "$GZOSP_PRODUCT" = "true" ]]; then
-        vendor/invictus/build/tools/gzosp_roomservice.py $product
-        elif [[ "$GZOSP_PRODUCT" = "false" ]]; then 
+        if [[ "$INV_PRODUCT" = "inv" ]]; then
         vendor/invictus/build/tools/invictus_roomservice.py $product
+        elif [[ "$INV_PRODUCT" = "gzosp" ]]; then 
+        vendor/invictus/build/tools/gzosp_roomservice.py $product
         fi
         cd - > /dev/null
         check_product $product
