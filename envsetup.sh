@@ -88,6 +88,9 @@ function check_product()
     elif (echo -n $1 | grep -q -e "^gzosp_") ; then
         INV_BUILD=$(echo -n $1 | sed -e 's/^gzosp_//g')
         export BUILD_NUMBER=$( (date +%s%N ; echo $INV_BUILD; hostname) | openssl sha1 | sed -e 's/.*=//g; s/ //g' | cut -c1-10 )
+    elif (echo -n $1 | grep -q -e "^lineage_") ; then
+        INV_BUILD=$(echo -n $1 | sed -e 's/^lineage_//g')
+        export BUILD_NUMBER=$( (date +%s%N ; echo $INV_BUILD; hostname) | openssl sha1 | sed -e 's/.*=//g; s/ //g' | cut -c1-10 )
     else
         INV_BUILD=
         INV_PRODUCT=$(echo "")
@@ -631,6 +634,8 @@ function lunch()
         vendor/invictus/build/tools/invictus_roomservice.py $product
         elif [[ "$INV_PRODUCT" = "gzosp" ]]; then 
         vendor/invictus/build/tools/gzosp_roomservice.py $product
+        elif [[ "$INV_PRODUCT" = "lineage" ]]; then 
+        vendor/invictus/build/tools/lineage_roomservice.py $product
         fi
         cd - > /dev/null
         check_product $product
