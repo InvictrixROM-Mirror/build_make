@@ -46,7 +46,7 @@ function hmm() {
 }
 
 function emu() {
-    vendor/invictus/utils/emulator/start_emulator_image.sh
+    vendor/invictus/utils/emulator/start_emulator_local.sh
 }
 
 # Get the value of a build variable as an absolute path.
