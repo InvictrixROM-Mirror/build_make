@@ -19,6 +19,7 @@ export HMM_DESCRIPTIVE=(
 "sepgrep: Greps on all local sepolicy files."
 "sgrep:   Greps on all local source files."
 "godir:   Go to the directory containing a file."
+"emu:     Starts the emulator"
 "mka:      Builds using SCHED_BATCH on all processors"
 "mkap:     Builds the module(s) using mka and pushes them to the device."
 "cmka:     Cleans and builds using mka."
@@ -42,6 +43,10 @@ function hmm() {
     for i in `cat $T/build/envsetup.sh | sed -n "/^[ \t]*function /s/function \([a-z_]*\).*/\1/p" | sort | uniq`; do
       echo "$i"
     done | column
+}
+
+function emu() {
+    vendor/invictus/utils/emulator/start_emulator_image.sh
 }
 
 # Get the value of a build variable as an absolute path.
