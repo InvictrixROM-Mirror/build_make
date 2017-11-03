@@ -1014,8 +1014,6 @@ $(if $(BOARD_SYSTEMIMAGE_SQUASHFS_BLOCK_SIZE),$(hide) echo "system_squashfs_bloc
 $(if $(BOARD_SYSTEMIMAGE_SQUASHFS_DISABLE_4K_ALIGN),$(hide) echo "system_squashfs_disable_4k_align=$(BOARD_SYSTEMIMAGE_SQUASHFS_DISABLE_4K_ALIGN)" >> $(1))
 $(if $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_SYSTEM_BASE_FS_PATH),$(hide) echo "system_base_fs_file=$(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_SYSTEM_BASE_FS_PATH)" >> $(1))
 $(if $(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_SYSTEM_HEADROOM),$(hide) echo "system_headroom=$(PRODUCTS.$(INTERNAL_PRODUCT).PRODUCT_SYSTEM_HEADROOM)" >> $(1))
-$(if $(BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE),$(hide) echo "userdata_fs_type=$(BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE)" >> $(1))
-$(if $(BOARD_USERDATAIMAGE_PARTITION_SIZE),$(hide) echo "userdata_size=$(BOARD_USERDATAIMAGE_PARTITION_SIZE)" >> $(1))
 $(if $(BOARD_FLASH_LOGICAL_BLOCK_SIZE), $(hide) echo "flash_logical_block_size=$(BOARD_FLASH_LOGICAL_BLOCK_SIZE)" >> $(1))
 $(if $(BOARD_FLASH_ERASE_BLOCK_SIZE), $(hide) echo "flash_erase_block_size=$(BOARD_FLASH_ERASE_BLOCK_SIZE)" >> $(1))
 $(if $(BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE),$(hide) echo "vendor_fs_type=$(BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE)" >> $(1))
@@ -1648,87 +1646,6 @@ $(INSTALLED_BOOTTARBALL_TARGET): $(FS_GET_STATS) $(INTERNAL_BOOTIMAGE_FILES)
 boottarball-nodeps btnod: $(FS_GET_STATS) \
                       $(filter-out boottarball-nodeps btnod,$(MAKECMDGOALS))
 	$(build-boottarball-target)
-
-
-# -----------------------------------------------------------------
-# data partition image
-INTERNAL_USERDATAIMAGE_FILES := \
-    $(filter $(TARGET_OUT_DATA)/%,$(ALL_DEFAULT_INSTALLED_MODULES))
-
-# Don't build userdata.img if it's extfs but no partition size
-skip_userdata.img :=
-ifdef INTERNAL_USERIMAGES_EXT_VARIANT
-ifndef BOARD_USERDATAIMAGE_PARTITION_SIZE
-skip_userdata.img := true
-endif
-endif
-
-ifneq ($(skip_userdata.img),true)
-userdataimage_intermediates := \
-    $(call intermediates-dir-for,PACKAGING,userdata)
-BUILT_USERDATAIMAGE_TARGET := $(PRODUCT_OUT)/userdata.img
-
-define build-userdataimage-target
-  $(call pretty,"Target userdata fs image: $(INSTALLED_USERDATAIMAGE_TARGET)")
-  @mkdir -p $(TARGET_OUT_DATA)
-  @mkdir -p $(userdataimage_intermediates) && rm -rf $(userdataimage_intermediates)/userdata_image_info.txt
-  $(call generate-userimage-prop-dictionary, $(userdataimage_intermediates)/userdata_image_info.txt, skip_fsck=true)
-  $(hide) PATH=$(foreach p,$(INTERNAL_USERIMAGES_BINARY_PATHS),$(p):)$$PATH \
-      ./build/tools/releasetools/build_image.py \
-      $(TARGET_OUT_DATA) $(userdataimage_intermediates)/userdata_image_info.txt $(INSTALLED_USERDATAIMAGE_TARGET) $(TARGET_OUT)
-  $(hide) $(call assert-max-image-size,$(INSTALLED_USERDATAIMAGE_TARGET),$(BOARD_USERDATAIMAGE_PARTITION_SIZE))
-endef
-
-# We just build this directly to the install location.
-INSTALLED_USERDATAIMAGE_TARGET := $(BUILT_USERDATAIMAGE_TARGET)
-INSTALLED_USERDATAIMAGE_TARGET_DEPS := \
-    $(INTERNAL_USERIMAGES_DEPS) \
-    $(INTERNAL_USERDATAIMAGE_FILES) \
-    $(BUILD_IMAGE_SRCS)
-$(INSTALLED_USERDATAIMAGE_TARGET): $(INSTALLED_USERDATAIMAGE_TARGET_DEPS)
-	$(build-userdataimage-target)
-
-.PHONY: userdataimage-nodeps
-userdataimage-nodeps: | $(INTERNAL_USERIMAGES_DEPS)
-	$(build-userdataimage-target)
-
-endif # not skip_userdata.img
-skip_userdata.img :=
-
-# ASAN libraries in the system image - build rule.
-ASAN_OUT_DIRS_FOR_SYSTEM_INSTALL := $(sort $(patsubst $(PRODUCT_OUT)/%,%,\
-  $(TARGET_OUT_SHARED_LIBRARIES) \
-  $(2ND_TARGET_OUT_SHARED_LIBRARIES) \
-  $(TARGET_OUT_VENDOR_SHARED_LIBRARIES) \
-  $(2ND_TARGET_OUT_VENDOR_SHARED_LIBRARIES)))
-# Extra options: Enforce the system user for the files to avoid having to change ownership.
-ASAN_SYSTEM_INSTALL_OPTIONS := --owner=1000 --group=1000
-# Note: experimentally, it seems not worth it to try to get "best" compression. We don't save
-#       enough space.
-$(ASAN_IN_SYSTEM_INSTALLED): $(INSTALLED_USERDATAIMAGE_TARGET_DEPS)
-	tar cfj $(ASAN_IN_SYSTEM_INSTALLED) $(ASAN_SYSTEM_INSTALL_OPTIONS) -C $(TARGET_OUT_DATA)/.. $(ASAN_OUT_DIRS_FOR_SYSTEM_INSTALL) >/dev/null
-
-#######
-## data partition tarball
-define build-userdatatarball-target
-    $(call pretty,"Target userdata fs tarball: " \
-                  "$(INSTALLED_USERDATATARBALL_TARGET)")
-    $(MKTARBALL) $(FS_GET_STATS) \
-		$(PRODUCT_OUT) data $(PRIVATE_USERDATA_TAR) \
-		$(INSTALLED_USERDATATARBALL_TARGET) $(TARGET_OUT)
-endef
-
-userdata_tar := $(PRODUCT_OUT)/userdata.tar
-INSTALLED_USERDATATARBALL_TARGET := $(userdata_tar).bz2
-$(INSTALLED_USERDATATARBALL_TARGET): PRIVATE_USERDATA_TAR := $(userdata_tar)
-$(INSTALLED_USERDATATARBALL_TARGET): $(FS_GET_STATS) $(INTERNAL_USERDATAIMAGE_FILES)
-	$(build-userdatatarball-target)
-
-$(call dist-for-goals,userdatatarball,$(INSTALLED_USERDATATARBALL_TARGET))
-
-.PHONY: userdatatarball-nodeps
-userdatatarball-nodeps: $(FS_GET_STATS)
-	$(build-userdatatarball-target)
 
 
 # -----------------------------------------------------------------

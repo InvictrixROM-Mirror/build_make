@@ -731,8 +731,6 @@ def main(argv):
       mount_point = "system"
     elif image_filename == "system_other.img":
       mount_point = "system_other"
-    elif image_filename == "userdata.img":
-      mount_point = "data"
     elif image_filename == "vendor.img":
       mount_point = "vendor"
     elif image_filename == "oem.img":

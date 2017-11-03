@@ -231,60 +231,6 @@ def CreateImage(input_dir, info_dict, what, output_file, block_list=None):
       info_dict[adjusted_blocks_key] = int(adjusted_blocks_value)/4096 - 1
 
 
-def AddUserdata(output_zip, prefix="IMAGES/"):
-  """Create a userdata image and store it in output_zip.
-
-  In most case we just create and store an empty userdata.img;
-  But the invoker can also request to create userdata.img with real
-  data from the target files, by setting "userdata_img_with_data=true"
-  in OPTIONS.info_dict.
-  """
-
-  img = OutputFile(output_zip, OPTIONS.input_tmp, prefix, "userdata.img")
-  if os.path.exists(img.input_name):
-    print("userdata.img already exists in %s, no need to rebuild..." % (
-        prefix,))
-    return
-
-  # Skip userdata.img if no size.
-  image_props = build_image.ImagePropFromGlobalDict(OPTIONS.info_dict, "data")
-  if not image_props.get("partition_size"):
-    return
-
-  print("creating userdata.img...")
-
-  # Use a fixed timestamp (01/01/2009) when packaging the image.
-  # Bug: 24377993
-  epoch = datetime.datetime.fromtimestamp(0)
-  timestamp = (datetime.datetime(2009, 1, 1) - epoch).total_seconds()
-  image_props["timestamp"] = int(timestamp)
-
-  # The name of the directory it is making an image out of matters to
-  # mkyaffs2image.  So we create a temp dir, and within it we create an
-  # empty dir named "data", or a symlink to the DATA dir,
-  # and build the image from that.
-  temp_dir = tempfile.mkdtemp()
-  OPTIONS.tempfiles.append(temp_dir)
-  user_dir = os.path.join(temp_dir, "data")
-  empty = (OPTIONS.info_dict.get("userdata_img_with_data") != "true")
-  if empty:
-    # Create an empty dir.
-    os.mkdir(user_dir)
-  else:
-    # Symlink to the DATA dir.
-    os.symlink(os.path.join(OPTIONS.input_tmp, "DATA"),
-               user_dir)
-
-  fstab = OPTIONS.info_dict["fstab"]
-  if fstab:
-    image_props["fs_type"] = fstab["/data"].fs_type
-  succ = build_image.BuildImage(user_dir, image_props, img.name)
-  assert succ, "build userdata.img image failed"
-
-  common.CheckSize(img.name, "userdata.img", OPTIONS.info_dict)
-  img.Write()
-
-
 def AddVBMeta(output_zip, boot_img_path, system_img_path, vendor_img_path,
               prefix="IMAGES/"):
   """Create a VBMeta image and store it in output_zip."""
@@ -430,9 +376,6 @@ def AddImagesToTargetFiles(filename):
   if has_system_other:
     banner("system_other")
     AddSystemOther(output_zip)
-  if not OPTIONS.is_signing:
-    banner("userdata")
-    AddUserdata(output_zip)
   if OPTIONS.info_dict.get("board_bpt_enable", None) == "true":
     banner("partition-table")
     AddPartitionTable(output_zip)
