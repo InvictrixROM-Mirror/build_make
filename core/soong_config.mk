@@ -15,11 +15,10 @@ endif
 
 # Create soong.variables with copies of makefile settings.  Runs every build,
 # but only updates soong.variables if it changes
-SOONG_VARIABLES_TMP := $(SOONG_VARIABLES).$$$$
-$(SOONG_VARIABLES): FORCE
-	$(hide) mkdir -p $(dir $@)
+SOONG_VARIABLES_TMP := $(shell mktemp -u)
+include vendor/invictus/build/soong/soong_config.mk
+$(SOONG_VARIABLES): FORCE invictus_soong
 	$(hide) (\
-	echo '{'; \
 	echo '    "Make_suffix": "-$(TARGET_PRODUCT)",'; \
 	echo ''; \
 	echo '    "Platform_sdk_version": $(PLATFORM_SDK_VERSION),'; \
@@ -68,11 +67,13 @@ $(SOONG_VARIABLES): FORCE
 	echo '    "EnableCFI": $(if $(filter true,$(ENABLE_CFI)),true,false),'; \
 	echo '    "Treble": $(if $(filter true,$(PRODUCT_FULL_TREBLE)),true,false),'; \
 	echo '    "Override_rs_driver": "$(OVERRIDE_RS_DRIVER)",'; \
+	echo '    "Libart_img_base": "$(LIBART_IMG_BASE)",'; \
 	echo ''; \
 	echo '    "ArtUseReadBarrier": $(if $(filter false,$(PRODUCT_ART_USE_READ_BARRIER)),false,true),'; \
 	echo ''; \
+	echo '    "ForcedShimLibs": "$(LINKER_FORCED_SHIM_LIBS)",'; \
 	echo '    "BtConfigIncludeDir": "$(BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR)"'; \
-	echo '}') > $(SOONG_VARIABLES_TMP); \
+	echo '}') >> $(SOONG_VARIABLES_TMP); \
 	if ! cmp -s $(SOONG_VARIABLES_TMP) $(SOONG_VARIABLES); then \
 	  mv $(SOONG_VARIABLES_TMP) $(SOONG_VARIABLES); \
 	else \

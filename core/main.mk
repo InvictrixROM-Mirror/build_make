@@ -249,7 +249,7 @@ endif
 # -----------------------------------------------------------------
 # Validate ADDITIONAL_BUILD_PROPERTIES.
 ifneq ($(ADDITIONAL_BUILD_PROPERTIES),)
-$(error ADDITIONAL_BUILD_PROPERTIES must not be set before here: $(ADDITIONAL_BUILD_PROPERTIES))
+$(warning ADDITIONAL_BUILD_PROPERTIES must not be set before here: $(ADDITIONAL_BUILD_PROPERTIES))
 endif
 
 #
@@ -479,6 +479,24 @@ endif
 ifeq ($(filter-out $(INTERNAL_MODIFIER_TARGETS),$(MAKECMDGOALS)),)
 .PHONY: $(INTERNAL_MODIFIER_TARGETS)
 $(INTERNAL_MODIFIER_TARGETS): $(DEFAULT_GOAL)
+endif
+
+# These targets are going to delete stuff, don't bother including
+# the whole directory tree if that's all we're going to do
+ifeq ($(MAKECMDGOALS),clean)
+dont_bother := true
+endif
+ifeq ($(MAKECMDGOALS),clobber)
+dont_bother := true
+endif
+ifeq ($(MAKECMDGOALS),novo)
+dont_bother := true
+endif
+ifeq ($(MAKECMDGOALS),dataclean)
+dont_bother := true
+endif
+ifeq ($(MAKECMDGOALS),installclean)
+dont_bother := true
 endif
 
 #
@@ -1113,6 +1131,12 @@ clean:
 
 .PHONY: clobber
 clobber: clean
+
+# This should be almost as good as a clobber but keeping many of the time intensive files - DHO
+.PHONY: novo
+novo:
+	@rm -rf $(OUT_DIR)/target/*
+	@echo -e ${CL_GRN}"Target directory removed."${CL_RST}
 
 # The rules for dataclean and installclean are defined in cleanbuild.mk.
 
