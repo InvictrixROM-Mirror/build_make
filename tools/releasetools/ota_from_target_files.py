@@ -502,7 +502,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
 
   system_progress = 0.75
   
-  script.Print(" ***********************************************   ");
+  script.Print(" *************************************************   ");
   script.Print("                 #SharpenYourBlade                 ");
   script.Print("        ____           _      __      _            ");
   script.Print("       /  _/___ _   __(_)____/ /_____(_)_  __      ");
@@ -511,7 +511,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
   script.Print("    /___/_/ /_/|___/_/\___/\__/_/  /_/_/|_|        ");
   script.Print("                                                   ");
   script.Print("           Ground Zero Based Project               ");
-  script.Print(" ***********************************************   ");                                            
+  script.Print(" *************************************************   ");                                            
                                       
   if GetBuildProp("ro.invictus.version", OPTIONS.info_dict) is not None:
   
@@ -521,7 +521,7 @@ else if get_stage("%(bcb_dev)s") == "3/3" then
     model = GetBuildProp("ro.product.device", OPTIONS.info_dict)
     buildday = GetBuildProp("ro.build.date", OPTIONS.info_dict)
     script.Print(" ******************* Rom Info ******************** "); 
-    script.Print(" Version: %s"%(version));
+    script.Print(" Invictrix Version: %s"%(version));
     script.Print(""); 
     script.Print(" Maintainer: %s"%(maintainer));
     script.Print("");
