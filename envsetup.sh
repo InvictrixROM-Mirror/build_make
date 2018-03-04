@@ -29,6 +29,7 @@ Invoke ". build/envsetup.sh" from your shell to add the following functions to y
 - mka:      Builds using SCHED_BATCH on all processors
 - repolastsync: Prints date and time of last repo sync.
 - repopick: Utility to fetch changes from Gerrit.
+- fuckjack: Adjusts jack configuration for low-memory systems.
 
 Environment options:
 - SANITIZE_HOST: Set to 'true' to use ASAN for all host modules. Note that
@@ -471,6 +472,11 @@ function repopick() {
     set_stuff_for_environment
     T=$(gettop)
     $T/build/tools/repopick.py $@
+}
+
+function fuckjack() {
+    T=$(gettop)
+    $T/build/tools/fuckjack.sh
 }
 
 function set_stuff_for_environment()
