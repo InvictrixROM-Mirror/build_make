@@ -408,6 +408,21 @@ else ifeq ($(my_clang),)
     my_clang := true
 endif
 
+my_sdclang := $(strip $(LOCAL_SDCLANG))
+my_sdclang_2 := $(strip $(LOCAL_SDCLANG_2))
+ifeq ($(my_sdclang),true)
+    ifeq ($(my_sdclang_2),true)
+        $(error LOCAL_SDCLANG and LOCAL_SDCLANG_2 can not be set to true at the same time!)
+    endif
+endif
+ifeq ($(SDCLANG),true)
+    ifeq ($(my_sdclang),)
+        ifneq ($(my_sdclang_2),true)
+            my_sdclang := true
+        endif
+    endif
+endif
+
 ifeq ($(LOCAL_C_STD),)
     my_c_std_version := $(DEFAULT_C_STD_VERSION)
 else ifeq ($(LOCAL_C_STD),experimental)
@@ -894,7 +909,7 @@ my_proto_source_suffix := .c
 my_proto_c_includes := external/nanopb-c
 my_protoc_flags := --nanopb_out=$(proto_gen_dir) \
     --plugin=external/nanopb-c/generator/protoc-gen-nanopb
-my_protoc_deps := $(NANOPB_SRCS) $(proto_sources_fullpath:%.proto=%.options)
+my_protoc_deps := $(NANOPB_SRCS) $(wildcard $(proto_sources_fullpath:%.proto=%.options))
 else
 my_proto_source_suffix := $(LOCAL_CPP_EXTENSION)
 ifneq ($(my_proto_source_suffix),.cc)
@@ -1515,9 +1530,21 @@ ifeq ($(LOCAL_SDK_VERSION)$(LOCAL_USE_VNDK),)
   my_c_includes += $(JNI_H_INCLUDE)
 endif
 
+# Find $1 in the exception project list.
+define find_in_cincludes_exception_projects
+$(subst $(space),, \
+  $(foreach project,$(TARGET_CINCLUDES_EXCEPTION_PROJECTS), \
+    $(if $(filter $(project)%,$(1)),$(project)) \
+  ) \
+)
+endef
+
 my_outside_includes := $(filter-out $(OUT_DIR)/%,$(filter /%,$(my_c_includes)))
 ifneq ($(my_outside_includes),)
-$(error $(LOCAL_MODULE_MAKEFILE): $(LOCAL_MODULE): C_INCLUDES must be under the source or output directories: $(my_outside_includes))
+# Further filter out optional exceptions
+  ifeq ($(call find_in_cincludes_exception_projects,$(LOCAL_MODULE_MAKEFILE)),)
+    $(error $(LOCAL_MODULE_MAKEFILE): $(LOCAL_MODULE): C_INCLUDES must be under the source or output directories: $(my_outside_includes))
+  endif
 endif
 
 # all_objects includes gen_o_objects which were part of LOCAL_GENERATED_SOURCES;

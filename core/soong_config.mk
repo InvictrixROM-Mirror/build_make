@@ -30,6 +30,7 @@ SOONG_VARIABLES_TMP := $(shell mktemp -u)
 include vendor/invictrix/build/soong/soong_config.mk
 $(SOONG_VARIABLES): FORCE invictrix_soong
 	$(hide) (\
+	echo '{'; \
 	echo '    "Make_suffix": "-$(TARGET_PRODUCT)",'; \
 	echo ''; \
 	echo '    "Platform_sdk_version": $(PLATFORM_SDK_VERSION),'; \
@@ -88,8 +89,11 @@ $(SOONG_VARIABLES): FORCE invictrix_soong
 	echo ''; \
 	echo '    "BtConfigIncludeDir": "$(BOARD_BLUETOOTH_BDROID_BUILDCFG_INCLUDE_DIR)",'; \
 	echo ''; \
-	echo '    "DeviceKernelHeaders": $(call json_list,$(strip $(TARGET_PROJECT_SYSTEM_INCLUDES)))'; \
-	echo '}') >> $(SOONG_VARIABLES_TMP); \
+	echo '    "DeviceKernelHeaders": $(call json_list,$(strip $(TARGET_PROJECT_SYSTEM_INCLUDES))),'; \
+	echo ''; \
+	echo '    "BoardUsesQTIHardware":  $(if $(BOARD_USES_QTI_HARDWARE),true,false)';  \
+	echo ''; \
+	echo '}') > $(SOONG_VARIABLES_TMP); \
 	if ! cmp -s $(SOONG_VARIABLES_TMP) $(SOONG_VARIABLES); then \
 	  mv $(SOONG_VARIABLES_TMP) $(SOONG_VARIABLES); \
 	else \
