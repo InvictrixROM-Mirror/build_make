@@ -120,12 +120,13 @@ def fetch_query(remote_url, query):
         raise Exception('Gerrit URL should be in the form http[s]://hostname/ or ssh://[user@]host[:port]')
 
 if __name__ == '__main__':
-    # Default to Carbon Gerrit
-    default_gerrit = 'https://review.carbonrom.org'
+    # Default to Invictrix Gerrit
+    default_gerrit ='http://review.invictrixrom.com'
 
     parser = argparse.ArgumentParser(formatter_class=argparse.RawDescriptionHelpFormatter, description=textwrap.dedent('''\
         repopick.py is a utility to simplify the process of cherry picking
-        patches from CarbonROM's Gerrit instance (or any gerrit instance of your choosing)
+        patches from InvictrixROM's Gerrit instance 
+(or any gerrit instance of your choosing)
         Given a list of change numbers, repopick will cd into the project path
         and cherry pick the latest patch available.
         With the --start-branch argument, the user can specify that a branch
@@ -203,7 +204,7 @@ if __name__ == '__main__':
     manifest = subprocess.check_output(['repo', 'manifest'])
     xml_root = ElementTree.fromstring(manifest)
     projects = xml_root.findall('project')
-    default_revision = xml_root.findall('.//*[@name="carbon"]')[0].get('revision').split('/')[-1]
+    default_revision = xml_root.findall('.//*[@name="invictrix"]')[0].get('revision').split('/')[-1]
 
     #dump project data into the a list of dicts with the following data:
     #{project: {path, revision}}
